@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Historias Clínicas – KineFisiosport</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:       #1a56db;
+      --blue-dark:  #1039a0;
+      --blue-light: #e8f0fe;
+      --white:      #ffffff;
+      --gray:       #f4f7fc;
+      --text:       #1e293b;
+      --muted:      #64748b;
+      --radius:     12px;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; color: var(--text); background: var(--white); }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 200;
+      background: var(--white);
+      box-shadow: 0 1px 8px rgba(0,0,0,.08);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5%; height: 68px;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo img { height: 52px; width: 52px; object-fit: contain; border-radius: 8px; }
+    .nav-logo span { font-size: 1.15rem; font-weight: 800; color: var(--blue); }
+    .nav-links { display: flex; gap: 26px; }
+    .nav-links a { text-decoration: none; font-size: .88rem; font-weight: 600; color: var(--muted); transition: color .2s; }
+    .nav-links a:hover { color: var(--blue); }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 6px; border: none; background: none; }
+    .hamburger span { display: block; width: 24px; height: 2.5px; background: var(--text); border-radius: 2px; transition: all .3s; }
+
+    /* ── MOBILE MENU ── */
+    .mobile-menu {
+      display: none; position: fixed; inset: 0; z-index: 300;
+      background: rgba(0,0,0,.5); opacity: 0; transition: opacity .3s;
+    }
+    .mobile-menu.open { display: flex; opacity: 1; }
+    .mobile-panel {
+      background: var(--white); width: 75%; max-width: 300px; height: 100%;
+      padding: 24px 28px; display: flex; flex-direction: column; gap: 0;
+      transform: translateX(-100%); transition: transform .3s;
+    }
+    .mobile-menu.open .mobile-panel { transform: translateX(0); }
+    .mobile-close { align-self: flex-end; font-size: 1.5rem; cursor: pointer; background: none; border: none; color: var(--text); margin-bottom: 24px; }
+    .mobile-panel a { display: block; padding: 14px 0; font-size: 1rem; font-weight: 600; color: var(--text); text-decoration: none; border-bottom: 1px solid #f0f0f0; }
+    .mobile-panel a:hover { color: var(--blue); }
+
+    /* ── HERO ── */
+    .hero {
+      background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue) 100%);
+      color: var(--white); text-align: center; padding: 70px 6% 65px;
+    }
+    .hero-badge {
+      display: inline-block; background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.3); border-radius: 999px;
+      font-size: .78rem; font-weight: 700; padding: 5px 16px;
+      margin-bottom: 20px; letter-spacing: .5px;
+    }
+    .hero h1 { font-size: clamp(1.9rem, 5vw, 3rem); font-weight: 800; line-height: 1.15; margin-bottom: 16px; }
+    .hero p { font-size: 1rem; font-weight: 300; opacity: .88; max-width: 520px; margin: 0 auto 32px; line-height: 1.7; }
+    .btn { display: inline-block; padding: 13px 30px; border-radius: 999px; font-weight: 700; font-size: .9rem; text-decoration: none; transition: transform .15s, box-shadow .15s; }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.18); }
+    .btn-white { background: var(--white); color: var(--blue); }
+
+    /* ── SECTION ── */
+    .cases-section { padding: 72px 6%; background: var(--gray); }
+    .section-label { font-size: .75rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--blue); margin-bottom: 8px; }
+    h2 { font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 800; color: var(--text); margin-bottom: 10px; }
+    .subtitle { color: var(--muted); font-size: .95rem; line-height: 1.6; max-width: 580px; margin-bottom: 40px; }
+
+    /* ── CASE CARDS ── */
+    .cases-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 28px;
+    }
+    .case-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,.07);
+      transition: transform .2s, box-shadow .2s;
+      display: flex;
+      flex-direction: column;
+    }
+    .case-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,.12); }
+
+    /* Gallery within card */
+    .case-gallery {
+      position: relative;
+      overflow: hidden;
+    }
+    .case-gallery-track {
+      display: flex;
+      transition: transform .4s ease;
+    }
+    .case-gallery-track img {
+      min-width: 100%;
+      height: 240px;
+      object-fit: cover;
+      display: block;
+    }
+    .gallery-nav {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      background: rgba(255,255,255,.85); border: none; border-radius: 50%;
+      width: 36px; height: 36px; cursor: pointer; font-size: .9rem;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,.15); z-index: 5; transition: background .2s;
+    }
+    .gallery-nav:hover { background: white; }
+    .gallery-prev { left: 10px; }
+    .gallery-next { right: 10px; }
+    .gallery-dots {
+      position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 6px;
+    }
+    .gallery-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: rgba(255,255,255,.6); border: none; cursor: pointer;
+      transition: background .2s;
+    }
+    .gallery-dot.active { background: white; }
+
+    /* single image fallback */
+    .case-img {
+      width: 100%; height: 240px; object-fit: cover; display: block;
+    }
+
+    .case-body { padding: 22px 24px 26px; flex: 1; display: flex; flex-direction: column; gap: 10px; }
+    .case-tag {
+      display: inline-block; background: var(--blue-light); color: var(--blue);
+      border-radius: 999px; font-size: .72rem; font-weight: 700;
+      padding: 4px 12px; align-self: flex-start;
+    }
+    .case-body h3 { font-size: 1.05rem; font-weight: 700; line-height: 1.3; }
+    .case-body p { font-size: .88rem; color: var(--muted); line-height: 1.65; flex: 1; }
+    .case-meta {
+      font-size: .78rem; color: #94a3b8; margin-top: 4px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .case-meta::before { content: '📅'; font-size: .8rem; }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      text-align: center; padding: 80px 20px; color: var(--muted);
+      display: none; /* Show this if no cases added yet */
+    }
+    .empty-state .icon { font-size: 3rem; margin-bottom: 16px; }
+    .empty-state p { font-size: .95rem; }
+
+    /* ── CTA ── */
+    .cta-section {
+      padding: 60px 6%; background: var(--white); text-align: center;
+    }
+    .cta-section h2 { margin-bottom: 12px; }
+    .cta-section p { color: var(--muted); font-size: .95rem; margin-bottom: 28px; max-width: 480px; margin-left: auto; margin-right: auto; }
+    .btn-blue { background: var(--blue); color: var(--white); }
+
+    /* ── WA FLOAT ── */
+    .wa-float {
+      position: fixed; bottom: 28px; right: 28px; z-index: 999;
+      background: #25D366; color: white; border-radius: 50%;
+      width: 58px; height: 58px; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,.25); text-decoration: none;
+      font-size: 1.6rem; transition: transform .2s;
+    }
+    .wa-float:hover { transform: scale(1.1); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--text); color: rgba(255,255,255,.7);
+      text-align: center; padding: 28px 5%; font-size: .82rem;
+    }
+    footer a { color: rgba(255,255,255,.7); text-decoration: none; }
+    footer a:hover { color: white; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .cases-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="index.html">
+    <img src="images/Logo-cropped.jpeg" alt="KineFisiosport logo" />
+    <span>KineFisiosport</span>
+  </a>
+  <div class="nav-links">
+    <a href="index.html#servicios">Servicios</a>
+    <a href="index.html#videos">Videos</a>
+    <a href="index.html#reseñas">Reseñas</a>
+    <a href="index.html#ubicacion">Ubicación</a>
+    <a href="index.html#contacto">Contacto</a>
+    <a href="historias-clinicas.html" style="color: var(--blue);">Casos de Éxito</a>
+  </div>
+  <button class="hamburger" id="hamburger" aria-label="Menú">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <div class="mobile-panel" id="mobilePanel">
+    <button class="mobile-close" id="mobileClose">✕</button>
+    <a href="index.html#servicios" onclick="closeMobile()">Servicios</a>
+    <a href="index.html#videos" onclick="closeMobile()">Videos</a>
+    <a href="index.html#reseñas" onclick="closeMobile()">Reseñas</a>
+    <a href="index.html#ubicacion" onclick="closeMobile()">Ubicación</a>
+    <a href="index.html#contacto" onclick="closeMobile()">Contacto</a>
+    <a href="historias-clinicas.html" onclick="closeMobile()">Casos de Éxito</a>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">✅ CASOS REALES · RESULTADOS COMPROBADOS</div>
+  <h1>Historias Clínicas<br/>de Éxito</h1>
+  <p>Cada caso es una historia de recuperación real. Conoce algunos de los pacientes que han mejorado su calidad de vida con nuestros tratamientos.</p>
+  <a href="index.html#contacto" class="btn btn-white">Agenda tu cita →</a>
+</div>
+
+<!-- CASES -->
+<section class="cases-section" id="casos">
+  <div class="section-label">Casos Clínicos</div>
+  <h2>Pacientes que recuperaron su vida</h2>
+  <p class="subtitle">Tratamientos personalizados con resultados reales. Cada historia refleja el compromiso de KineFisiosport con la rehabilitación efectiva.</p>
+
+  <div class="cases-grid" id="casesGrid">
+
+    <!-- ═══════════════════════════════════════════════════
+         CASO 1 — Ejemplo con UNA sola imagen
+         Para agregar más imágenes al carrusel de la tarjeta,
+         cambia a la estructura "con carrusel" que está abajo.
+    ════════════════════════════════════════════════════ -->
+    <div class="case-card">
+      <img class="case-img" src="images/casos/caso1-foto1.jpg" alt="Caso 1" onerror="this.src='https://placehold.co/600x240/e8f0fe/1a56db?text=Foto+del+caso'" />
+      <div class="case-body">
+        <span class="case-tag">Rodilla</span>
+        <h3>Recuperación post-quirúrgica de ligamento cruzado anterior</h3>
+        <p>Paciente de 28 años con rotura de LCA tras lesión deportiva. Tras 12 semanas de fisioterapia intensiva combinando electroestimulación, ejercicio de estabilidad y vendaje neuromuscular, logró retomar su actividad deportiva al 100%.</p>
+        <div class="case-meta">Junio 2025</div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════
+         CASO 2 — Ejemplo con MÚLTIPLES imágenes (carrusel)
+         Duplica este bloque para agregar más casos con fotos.
+    ════════════════════════════════════════════════════ -->
+    <div class="case-card">
+      <div class="case-gallery" data-gallery>
+        <div class="case-gallery-track">
+          <img src="images/casos/caso2-foto1.jpg" alt="Caso 2 foto 1" onerror="this.src='https://placehold.co/600x240/e8f0fe/1a56db?text=Foto+1'" />
+          <img src="images/casos/caso2-foto2.jpg" alt="Caso 2 foto 2" onerror="this.src='https://placehold.co/600x240/dbeafe/1039a0?text=Foto+2'" />
+          <img src="images/casos/caso2-foto3.jpg" alt="Caso 2 foto 3" onerror="this.src='https://placehold.co/600x240/bfdbfe/1039a0?text=Foto+3'" />
+        </div>
+        <button class="gallery-nav gallery-prev" aria-label="Anterior">‹</button>
+        <button class="gallery-nav gallery-next" aria-label="Siguiente">›</button>
+        <div class="gallery-dots">
+          <button class="gallery-dot active"></button>
+          <button class="gallery-dot"></button>
+          <button class="gallery-dot"></button>
+        </div>
+      </div>
+      <div class="case-body">
+        <span class="case-tag">Columna</span>
+        <h3>Rehabilitación de hernia discal lumbar sin cirugía</h3>
+        <p>Paciente de 45 años con dolor lumbar crónico e irradiación a pierna derecha. Con un programa de 8 semanas de ultrasonido terapéutico, masaje de descarga y ejercicio funcional, eliminó el dolor por completo y evitó la intervención quirúrgica.</p>
+        <div class="case-meta">Mayo 2025</div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════
+         CASO 3
+    ════════════════════════════════════════════════════ -->
+    <div class="case-card">
+      <img class="case-img" src="images/casos/caso3-foto1.jpg" alt="Caso 3" onerror="this.src='https://placehold.co/600x240/e8f0fe/1a56db?text=Foto+del+caso'" />
+      <div class="case-body">
+        <span class="case-tag">Adulto Mayor</span>
+        <h3>Mejora de movilidad y equilibrio en paciente de 72 años</h3>
+        <p>Paciente geriátrico con dificultad para caminar y riesgo de caídas. Tras un programa de entrenamiento funcional para adultos mayores y trabajo de propiocepción, recuperó la independencia en sus actividades diarias.</p>
+        <div class="case-meta">Abril 2025</div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════
+         PLANTILLA — Copia este bloque para agregar un caso nuevo
+         con UNA imagen. Cambia los datos y la ruta de la imagen.
+
+    <div class="case-card">
+      <img class="case-img" src="images/casos/casoN-foto1.jpg" alt="Descripción" onerror="this.src='https://placehold.co/600x240/e8f0fe/1a56db?text=Foto+del+caso'" />
+      <div class="case-body">
+        <span class="case-tag">Área del cuerpo</span>
+        <h3>Título del caso</h3>
+        <p>Descripción del caso: edad del paciente, diagnóstico, tratamiento aplicado y resultado obtenido.</p>
+        <div class="case-meta">Mes Año</div>
+      </div>
+    </div>
+    ════════════════════════════════════════════════════ -->
+
+    <!-- ═══════════════════════════════════════════════════
+         PLANTILLA con carrusel — Copia para caso con varias fotos
+
+    <div class="case-card">
+      <div class="case-gallery" data-gallery>
+        <div class="case-gallery-track">
+          <img src="images/casos/casoN-foto1.jpg" alt="Foto 1" onerror="this.src='https://placehold.co/600x240/e8f0fe/1a56db?text=Foto+1'" />
+          <img src="images/casos/casoN-foto2.jpg" alt="Foto 2" onerror="this.src='https://placehold.co/600x240/dbeafe/1039a0?text=Foto+2'" />
+        </div>
+        <button class="gallery-nav gallery-prev">‹</button>
+        <button class="gallery-nav gallery-next">›</button>
+        <div class="gallery-dots">
+          <button class="gallery-dot active"></button>
+          <button class="gallery-dot"></button>
+        </div>
+      </div>
+      <div class="case-body">
+        <span class="case-tag">Área del cuerpo</span>
+        <h3>Título del caso</h3>
+        <p>Descripción...</p>
+        <div class="case-meta">Mes Año</div>
+      </div>
+    </div>
+    ════════════════════════════════════════════════════ -->
+
+  </div><!-- /cases-grid -->
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="section-label">¿Lista para empezar?</div>
+  <h2>Tu recuperación también puede ser nuestra próxima historia de éxito</h2>
+  <p>Agenda una evaluación inicial y diseñamos un plan de tratamiento personalizado para ti.</p>
+  <a href="index.html#contacto" class="btn btn-blue">Agendar cita →</a>
+</section>
+
+<!-- WA BUTTON -->
+<a class="wa-float" href="https://wa.me/525512924682" target="_blank" rel="noopener" aria-label="WhatsApp">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="30" height="30">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+  </svg>
+</a>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2025 <strong style="color:white;">KineFisiosport</strong> · Fisioterapia Deportiva y Geriátrica ·
+    <a href="mailto:claudiavega@kinefisiosport.com">claudiavega@kinefisiosport.com</a> ·
+    <a href="index.html">← Volver al inicio</a>
+  </p>
+</footer>
+
+<script>
+  // ── Hamburger ──
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  const mobileClose = document.getElementById('mobileClose');
+
+  hamburger.addEventListener('click', () => {
+    mobileMenu.style.display = 'flex';
+    setTimeout(() => mobileMenu.classList.add('open'), 10);
+  });
+
+  function closeMobile() {
+    mobileMenu.classList.remove('open');
+    setTimeout(() => mobileMenu.style.display = 'none', 300);
+  }
+
+  mobileClose.addEventListener('click', closeMobile);
+  mobileMenu.addEventListener('click', e => { if (e.target === mobileMenu) closeMobile(); });
+
+  // ── Card Galleries ──
+  document.querySelectorAll('[data-gallery]').forEach(gallery => {
+    const track = gallery.querySelector('.case-gallery-track');
+    const dots  = gallery.querySelectorAll('.gallery-dot');
+    let current = 0;
+    const total = track.querySelectorAll('img').length;
+
+    function goTo(n) {
+      current = (n + total) % total;
+      track.style.transform = `translateX(-${current * 100}%)`;
+      dots.forEach((d, i) => d.classList.toggle('active', i === current));
+    }
+
+    gallery.querySelector('.gallery-prev').addEventListener('click', () => goTo(current - 1));
+    gallery.querySelector('.gallery-next').addEventListener('click', () => goTo(current + 1));
+    dots.forEach((d, i) => d.addEventListener('click', () => goTo(i)));
+  });
+</script>
+</body>
+</html>
